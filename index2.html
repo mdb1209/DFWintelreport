@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DFW Float Rep Intelligence Report</title>
+<style>
+  :root {
+    --navy: #0f2044;
+    --navy-light: #1a3260;
+    --teal: #1a7f8e;
+    --teal-light: #2aa8bb;
+    --teal-pale: #e8f6f8;
+    --amber: #e07b2a;
+    --amber-light: #fdf3e9;
+    --red: #c0392b;
+    --red-light: #fdf0ee;
+    --green: #1e7d4b;
+    --green-light: #e8f5ee;
+    --white: #ffffff;
+    --gray-light: #f5f7fa;
+    --gray-mid: #e2e8f0;
+    --gray-text: #64748b;
+    --body-text: #1e293b;
+    --border: #d1d5db;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--gray-light);
+    color: var(--body-text);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ─── HEADER ─── */
+  .report-header {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 60%, var(--teal) 100%);
+    color: white;
+    padding: 32px 40px 28px;
+  }
+  .report-header .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--teal-light);
+    margin-bottom: 6px;
+  }
+  .report-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+  .report-header .sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.72);
+  }
+  .header-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .meta-pill {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.85);
+  }
+
+  /* ─── TAB NAV ─── */
+  .tab-nav {
+    background: var(--navy);
+    display: flex;
+    overflow-x: auto;
+    padding: 0 24px;
+    gap: 2px;
+    scrollbar-width: none;
+  }
+  .tab-nav::-webkit-scrollbar { display: none; }
+  .tab-btn {
+    padding: 14px 20px;
+    border: none;
+    background: transparent;
+    color: rgba(255,255,255,0.55);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.2px;
+  }
+  .tab-btn:hover { color: rgba(255,255,255,0.85); }
+  .tab-btn.active {
+    color: white;
+    border-bottom-color: var(--teal-light);
+  }
+
+  /* ─── CONTENT ─── */
+  .tab-content { display: none; padding: 32px 40px; max-width: 1200px; margin: 0 auto; }
+  .tab-content.active { display: block; }
+
+  /* ─── SECTION TITLES ─── */
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+    border-left: 4px solid var(--teal);
+    padding-left: 12px;
+  }
+  .section-sub {
+    font-size: 13px;
+    color: var(--gray-text);
+    margin-bottom: 20px;
+    padding-left: 16px;
+  }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    padding: 22px 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+  }
+  .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .card-subtitle {
+    font-size: 12px;
+    color: var(--gray-text);
+    margin-top: 2px;
+  }
+  .badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+    white-space: nowrap;
+  }
+  .badge-teal { background: var(--teal-pale); color: var(--teal); }
+  .badge-amber { background: var(--amber-light); color: var(--amber); }
+  .badge-green { background: var(--green-light); color: var(--green); }
+  .badge-navy { background: #e8ecf4; color: var(--navy); }
+  .badge-red { background: var(--red-light); color: var(--red); }
+
+  /* ─── GRID ─── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  /* ─── INFO ROWS ─── */
+  .info-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 7px;
+    font-size: 13px;
+    align-items: flex-start;
+  }
+  .info-label {
+    font-weight: 700;
+    color: var(--navy);
+    min-width: 110px;
+    flex-shrink: 0;
+  }
+  .info-val { color: var(--body-text); }
+
+  /* ─── LISTS ─── */
+  .bullet-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .bullet-list li {
+    padding: 5px 0 5px 20px;
+    position: relative;
+    font-size: 13px;
+    border-bottom: 1px solid var(--gray-mid);
+  }
+  .bullet-list li:last-child { border-bottom: none; }
+  .bullet-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 12px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--teal);
+  }
+  .bullet-list li.highlight::before { background: var(--amber); }
+  .bullet-list li.highlight { font-weight: 600; }
+
+  /* ─── CALLOUT BOXES ─── */
+  .callout {
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+  .callout-title {
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .callout-teal { background: var(--teal-pale); border-left: 4px solid var(--teal); }
+  .callout-teal .callout-title { color: var(--teal); }
+  .callout-amber { background: var(--amber-light); border-left: 4px solid var(--amber); }
+  .callout-amber .callout-title { color: var(--amber); }
+  .callout-green { background: var(--green-light); border-left: 4px solid var(--green); }
+  .callout-green .callout-title { color: var(--green); }
+  .callout-red { background: var(--red-light); border-left: 4px solid var(--red); }
+  .callout-red .callout-title { color: var(--red); }
+  .callout-navy { background: #e8ecf4; border-left: 4px solid var(--navy); }
+  .callout-navy .callout-title { color: var(--navy); }
+
+  /* ─── TABLES ─── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  .data-table th {
+    background: var(--navy);
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+  }
+  .data-table th:first-child { border-radius: 6px 0 0 0; }
+  .data-table th:last-child { border-radius: 0 6px 0 0; }
+  .data-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--gray-mid);
+    vertical-align: top;
+  }
+  .data-table tr:hover td { background: var(--gray-light); }
+  .data-table tr:last-child td { border-bottom: none; }
+  .data-table .highlight-row td { background: var(--teal-pale); font-weight: 600; }
+
+  /* ─── TALKING POINT ITEMS ─── */
+  .tp-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-mid);
+    align-items: flex-start;
+  }
+  .tp-item:last-child { border-bottom: none; }
+  .tp-num {
+    background: var(--teal);
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .tp-text { font-size: 13px; }
+  .tp-strong { font-weight: 700; color: var(--navy); }
+
+  /* ─── PRACTICE TABS (inner) ─── */
+  .practice-nav {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .practice-btn {
+    padding: 7px 14px;
+    border: 2px solid var(--border);
+    background: white;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-text);
+    transition: all 0.2s;
+  }
+  .practice-btn:hover { border-color: var(--teal); color: var(--teal); }
+  .practice-btn.active { background: var(--teal); border-color: var(--teal); color: white; }
+
+  .practice-panel { display: none; }
+  .practice-panel.active { display: block; }
+
+  /* ─── PHYSICIAN TAGS ─── */
+  .physician-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .physician-card {
+    background: var(--gray-light);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .physician-card.joint-focus {
+    background: var(--teal-pale);
+    border-color: var(--teal-light);
+  }
+  .physician-name {
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--navy);
+    margin-bottom: 4px;
+  }
+  .physician-spec {
+    font-size: 11px;
+    color: var(--gray-text);
+  }
+  .physician-spec .spec-tag {
+    display: inline-block;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 2px 8px;
+    margin: 2px 2px 0 0;
+    font-size: 11px;
+  }
+  .physician-card.joint-focus .spec-tag {
+    background: var(--teal);
+    border-color: var(--teal);
+    color: white;
+  }
+  .target-star {
+    font-size: 11px;
+    color: var(--amber);
+    font-weight: 700;
+    margin-top: 4px;
+  }
+
+  /* ─── DIVIDER ─── */
+  .divider { border: none; border-top: 1px solid var(--gray-mid); margin: 20px 0; }
+
+  /* ─── STAT BOXES ─── */
+  .stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .stat-box {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    flex: 1;
+    min-width: 140px;
+    text-align: center;
+  }
+  .stat-number { font-size: 28px; font-weight: 800; color: var(--navy); }
+  .stat-label { font-size: 11px; color: var(--gray-text); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+  /* ─── COMPARISON BLOCK ─── */
+  .compare-block {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .compare-side {
+    background: white;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .compare-header {
+    padding: 12px 18px;
+    font-weight: 700;
+    font-size: 13px;
+    color: white;
+  }
+  .compare-header.ours { background: var(--teal); }
+  .compare-header.theirs { background: var(--amber); }
+  .compare-body { padding: 16px 18px; }
+  @media (max-width: 700px) { .compare-block { grid-template-columns: 1fr; } }
+
+  /* ─── LOCATION CHIPS ─── */
+  .location-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .loc-chip {
+    background: var(--navy);
+    color: white;
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  /* ─── SCROLLABLE TABLES ─── */
+  .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+
+  /* ─── VA LOCATION CARD ─── */
+  .va-location {
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--gray-mid);
+    align-items: flex-start;
+  }
+  .va-location:last-child { border-bottom: none; }
+  .va-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--navy);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .va-name { font-weight: 700; color: var(--navy); font-size: 13px; }
+  .va-addr { font-size: 12px; color: var(--gray-text); }
+  .va-phone { font-size: 12px; color: var(--teal); font-weight: 600; }
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="report-header">
+  <div class="label">Market Intelligence Report</div>
+  <h1>DFW Float Rep Account Brief</h1>
+  <div class="sub">BaylorxUMP Orthopedic Network · Dallas VA System · Competitive & Billing Analysis</div>
+  <div class="header-meta">
+    <div class="meta-pill">📍 Dallas–Fort Worth Metroplex</div>
+    <div class="meta-pill">🏥 5 UMP Practices</div>
+    <div class="meta-pill">🎖️ VA North Texas Health Care System</div>
+    <div class="meta-pill">📅 June 2026</div>
+  </div>
+</div>
+
+<!-- TAB NAV -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('overview')">Network Overview</button>
+  <button class="tab-btn" onclick="switchTab('practices')">Practice Profiles</button>
+  <button class="tab-btn" onclick="switchTab('joints')">Total Joint Quick Ref</button>
+  <button class="tab-btn" onclick="switchTab('competition')">Therapy at Home Competition</button>
+  <button class="tab-btn" onclick="switchTab('cms')">CMS Cost Analysis</button>
+  <button class="tab-btn" onclick="switchTab('va')">Dallas VA</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB 1: OVERVIEW -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="tab-overview" class="tab-content active">
+
+  <div class="section-title">United Musculoskeletal Partners (UMP) Network</div>
+  <div class="section-sub">Understanding the platform behind all five accounts</div>
+
+  <div class="grid-2">
+    <div>
+      <div class="callout callout-navy">
+        <div class="callout-title">What is UMP?</div>
+        United Musculoskeletal Partners is a <strong>physician-owned management services organization (MSO)</strong> - the nation's leading MSK MSO. Formed in December 2021 by Resurgens Orthopaedics. UMP handles billing, management, and business functions under a shared platform while practices retain clinical independence.
+      </div>
+      <div class="callout callout-green">
+        <div class="callout-title">✅ The Baylor Partnership - Updated</div>
+        Baylor Scott &amp; White has officially signed a <strong>joint venture contract with UMP</strong>, making these practices official Baylor partners. <strong>No rebranding will occur</strong> - the practices retain their existing names and identities. Additionally, most providers across the network are already <strong>Tier 1 providers under the Baylor Quality Alliance (BQA)</strong>, BSW's physician performance network that recognizes high-quality, cost-efficient care. This JV reinforces the practices' strategic alignment with BSW's value-based care priorities.
+        <br><br>
+        Note: These practices remain independent group practices under UMP's MSO umbrella - they are distinct from BSW's directly employed physician network (BSW Orthopedic Associates of Dallas, BSW Orthopaedic &amp; Spine Hospital Arlington). The BSW/Luna "Therapy at Home" competitive threat still applies and should be addressed separately.
+      </div>
+      <div class="callout callout-teal">
+        <div class="callout-title">Network ACO &amp; Quality Alliance Connections</div>
+        Several UMP practices participate in <strong>Southwestern Health Resources (SWHR)</strong> - the UT Southwestern / Texas Health Resources ACO serving 790,000+ patients across 16 North Texas counties. SWHR ranked #3 nationally in Medicare ACO savings. BQA participation varies by practice - see individual profiles for tier detail. Value-based cost and quality performance is a top priority across the network.
+      </div>
+
+      <hr class="divider">
+      <div class="section-title">PCP Referral Volume by Practice - FY2025</div>
+      <div class="section-sub">Source: Baylor Scott &amp; White official UMP partnership presentation · BSWQA = BSW Quality Alliance PCPs referring to UMP</div>
+
+      <div class="table-wrap" style="margin-bottom:16px;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Practice</th>
+              <th>BSWQA Providers</th>
+              <th>BQA Tier</th>
+              <th>FY2025 PCP→UMP Referrals</th>
+              <th>Primary Referral Source Locations</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="highlight-row">
+              <td><strong>AOA (Arlington Ortho Associates)</strong></td>
+              <td>22 BSWQA providers</td>
+              <td><span class="badge badge-green">21 Tier 1 · 1 Tier 2</span></td>
+              <td><strong>2,223</strong> - highest in network</td>
+              <td>Riverside, IMA Irving, MSCI, Waxahachie, Lakeridge, Midlothian, Mansfield, Red Oak</td>
+            </tr>
+            <tr>
+              <td><strong>All-Star Orthopaedics</strong></td>
+              <td>8 BSWQA providers</td>
+              <td><span class="badge badge-green">All Tier 1</span></td>
+              <td><strong>608</strong></td>
+              <td>Southlake, IM at Irving/Coppell, Las Colinas, Colleyville, MSCI</td>
+            </tr>
+            <tr>
+              <td><strong>OAFM (Orthopedic Assoc. Flower Mound)</strong></td>
+              <td>9 providers</td>
+              <td><span class="badge badge-amber">Non-QA</span></td>
+              <td><strong>293</strong></td>
+              <td>Highland Village, Flower Mound</td>
+            </tr>
+            <tr>
+              <td><strong>NTxOrtho / North Texas Ortho &amp; Sports Med</strong></td>
+              <td>1 BSWQA provider</td>
+              <td><span class="badge badge-green">Tier 1</span></td>
+              <td><strong>290</strong></td>
+              <td>Mostly Southlake, Colleyville, Keller</td>
+            </tr>
+            <tr>
+              <td><strong>OrthoTexas</strong></td>
+              <td>9 BSWQA providers</td>
+              <td><span class="badge badge-navy">8 Tier 1 · 3 Tier 2</span></td>
+              <td><strong>186</strong> - lowest vs. network size</td>
+              <td>Castle Hills, The Star, Flower Mound, DDA Plano</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid-2">
+        <div class="callout callout-teal">
+          <div class="callout-title">📊 Market Capture Insight - All Saints, Grapevine, Irving</div>
+          The PCP referral chart shows that where BSW's own Medical Group ortho presence is thin (<strong>All Saints/Fort Worth, Grapevine, Irving</strong>), UMP captures the majority of ortho referrals from BSW-aligned PCPs. These three markets have the <strong>highest BSWQA-to-UMP referral ratios</strong> in the system - meaning the patient population flowing through these markets is already orienting toward UMP practices. These are your highest-volume home health opportunity zones.
+        </div>
+        <div class="callout callout-amber">
+          <div class="callout-title">⚠️ OrthoTexas - Referral Underperformance</div>
+          OrthoTexas has 9 BSWQA providers across 4 clinics but generated only <strong>186 PCP referrals in FY2025</strong> - the lowest in the network despite being one of the larger practices. This suggests either lower BSW PCP alignment in the Frisco/Plano corridor or that Med Group orthopedists are capturing more of those referrals. The practice may be less entrenched in the BSW referral ecosystem - consider this a developing account.
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px;">The Five Target Accounts</div>
+        <div class="bullet-list" style="list-style:none; padding:0;">
+          <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--gray-mid);">
+            <span class="badge badge-teal">NTxOrtho</span>
+            <span style="font-size:13px; font-weight:600;">North Texas Orthopedics &amp; Spine Center</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--gray-mid);">
+            <span class="badge badge-teal">ASO</span>
+            <span style="font-size:13px; font-weight:600;">All-Star Orthopaedics</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--gray-mid);">
+            <span class="badge badge-teal">AOA</span>
+            <span style="font-size:13px; font-weight:600;">AOA Orthopedic Specialists</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--gray-mid);">
+            <span class="badge badge-teal">OTX</span>
+            <span style="font-size:13px; font-weight:600;">OrthoTexas</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px; padding:8px 0;">
+            <span class="badge badge-teal">OAFM</span>
+            <span style="font-size:13px; font-weight:600;">Orthopedic Associates of Flower Mound</span>
+          </div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat-box"><div class="stat-number">29</div><div class="stat-label">AOA MDs/DOs · 6 Clinics · 7 Rehabs</div></div>
+        <div class="stat-box"><div class="stat-number">12</div><div class="stat-label">OrthoTexas MDs/DOs · 4 Clinics · 3 Rehabs</div></div>
+        <div class="stat-box"><div class="stat-number">12</div><div class="stat-label">NTxOrtho MDs/DOs · 2 Clinics · 2 Rehabs</div></div>
+        <div class="stat-box"><div class="stat-number">10</div><div class="stat-label">All-Star MDs/DOs · 4 Clinics · 2 Rehabs</div></div>
+        <div class="stat-box" style="border-color:var(--teal);"><div class="stat-number" style="color:var(--teal);">11</div><div class="stat-label">OAFM MDs/DOs · 2 Clinics · <strong style="color:var(--red);">0 Rehabs ⭐</strong></div></div>
+      </div>
+      <div class="callout callout-teal" style="margin-top:0; margin-bottom:0;">
+        <div class="callout-title">Source: Baylor Scott &amp; White Official UMP Partnership Presentation</div>
+        Network totals across all 5 practices: <strong>74 MDs/DOs · 38 NPs/PAs · 85 PTs/OTs/PTAs/ATs · 18 clinics · 14 rehab locations</strong>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="section-title">Competitive Threat: BSW + Luna "Therapy at Home"</div>
+  <div class="section-sub">What you're up against and why it matters</div>
+
+  <div class="compare-block">
+    <div class="compare-side">
+      <div class="compare-header theirs">🏢 BSW / Luna - "Therapy at Home"</div>
+      <div class="compare-body">
+        <ul class="bullet-list">
+          <li>Baylor Scott &amp; White Institute for Rehabilitation + Luna (on-demand PT company)</li>
+          <li>Therapist travels to patient's home with equipment</li>
+          <li>Bills Medicare <strong>Part B outpatient</strong> (POS 12 - home)</li>
+          <li>Patient pays <strong>20% coinsurance + $283 deductible</strong></li>
+          <li class="highlight">Therapy ONLY - no nursing, no clinician-supported ADLs</li>
+          <li>No homebound requirement - available to more patients</li>
+          <li>Cheaper per episode for CMS (~$1,300–$2,100 vs. your $2,000–$4,400)</li>
+          <li>Lower overhead for BSW/Luna = profitable business model</li>
+        </ul>
+      </div>
+    </div>
+    <div class="compare-side">
+      <div class="compare-header ours">✅ Your Home Health Model</div>
+      <div class="compare-body">
+        <ul class="bullet-list">
+          <li>Bills Part A or Part B via <strong>home health benefit</strong></li>
+          <li>Patient pays <strong>$0 - Medicare covers 100%</strong></li>
+          <li class="highlight">Nursing + Therapy in one coordinated plan of care</li>
+          <li>Skilled nursing catches DVT, wound complications, medication issues</li>
+          <li>Bundled PDGM payment covers all disciplines</li>
+          <li>Strong argument in bundled payment models (CJR-X coming 2027)</li>
+          <li>Cannot run simultaneously with outpatient Part B therapy</li>
+          <li>Requires homebound documentation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB 2: PRACTICE PROFILES -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="tab-practices" class="tab-content">
+
+  <div class="section-title">UMP Practice Profiles</div>
+  <div class="section-sub">Select a practice below for full profile, provider list, and opportunity notes</div>
+
+  <div class="practice-nav">
+    <button class="practice-btn active" onclick="switchPractice('ntx')">NTxOrtho</button>
+    <button class="practice-btn" onclick="switchPractice('allstar')">All-Star Orthopaedics</button>
+    <button class="practice-btn" onclick="switchPractice('aoa')">AOA Orthopedic Specialists</button>
+    <button class="practice-btn" onclick="switchPractice('otx')">OrthoTexas</button>
+    <button class="practice-btn" onclick="switchPractice('oafm')">Ortho Assoc. Flower Mound</button>
+  </div>
+
+  <!-- ─── NTxOrtho ─── -->
+  <div id="practice-ntx" class="practice-panel active">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">North Texas Orthopedics &amp; Spine Center</div>
+          <div class="card-subtitle">NTxOrtho · Est. 1989 · Part of UMP</div>
+        </div>
+        <span class="badge badge-teal">HIGH PRIORITY</span>
+      </div>
+      <div class="grid-2">
+        <div>
+          <div class="info-row"><span class="info-label">📍 Locations</span><span class="info-val">
+            <div class="location-chips">
+              <span class="loc-chip">Grapevine</span>
+              <span class="loc-chip">Keller/Alliance</span>
+            </div>
+          </span></div>
+          <div style="height:8px;"></div>
+          <div class="info-row"><span class="info-label">🏠 Grapevine</span><span class="info-val">2535 Ira E Woods Ave, Suite 100, Grapevine TX 76051</span></div>
+          <div class="info-row"><span class="info-label">🏠 Keller/Alliance</span><span class="info-val">4501 Heritage Trace Pkwy, Suite 101, Fort Worth TX 76244</span></div>
+          <div class="info-row"><span class="info-label">📞 Phone</span><span class="info-val">(817) 481-2121</span></div>
+          <div class="info-row"><span class="info-label">👥 Physicians</span><span class="info-val">12 MDs/DOs · 9 NPs/PAs · 6 PTs/OTs/PTAs</span></div>
+          <div class="info-row"><span class="info-label">⭐ BQA Status</span><span class="info-val">1 BSWQA provider - Tier 1</span></div>
+          <div class="info-row"><span class="info-label">📨 FY2025 Referrals</span><span class="info-val">290 PCP→UMP referrals · Southlake, Colleyville, Keller</span></div>
+          <div class="info-row"><span class="info-label">💊 Insurance</span><span class="info-val">Commercial PPO, Medicare, Medicare Advantage · Uses AthenaHealth</span></div>
+          <div class="info-row"><span class="info-label">🌍 Geography</span><span class="info-val">Grapevine, Southlake, Colleyville, Keller, NW Tarrant County, Alliance corridor</span></div>
+        </div>
+        <div>
+          <div class="callout callout-green">
+            <div class="callout-title">📊 Demographics &amp; Opportunity</div>
+            Grapevine and Keller/Alliance serve a mix of working adults and a growing Medicare-age population in the NW Fort Worth suburbs. The Alliance corridor is one of the fastest-growing markets in DFW. Nathan Williams and Moffett are doing significant total joint volume - Williams is your <strong>#1 total joint target</strong> at this practice.
+          </div>
+          <div class="callout callout-amber">
+            <div class="callout-title">On-Site PT - Note</div>
+            NTxOrtho has its own in-house PT team (Bryan Vaughn, Nancy Abdelmeseh, Evan Powell, Kevin Harris + PTAs). Be aware of this dynamic - surgeons may default to in-house PT post-op before considering home health. Lead with the nursing component and the homebound criteria window immediately post-surgery.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title" style="font-size:15px; margin-bottom:14px;">Physician Roster - Highlighted by Specialty</div>
+    <div class="callout callout-teal" style="margin-bottom:14px;">
+      <div class="callout-title">Legend</div>
+      <strong>Blue cards</strong> = Total joint focus (hip &amp; knee) - primary home health referral targets &nbsp;|&nbsp; Gray cards = other specialties
+    </div>
+    <div class="physician-grid">
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Nathan E. Williams II, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Knee</span><span class="spec-tag">Hip</span></div>
+        <div class="target-star">⭐ PRIMARY TARGET - Adult Lower Extremity Reconstruction Fellowship</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Kerry M. Donegan, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Knee</span><span class="spec-tag">Hip</span><span class="spec-tag">Shoulder</span></div>
+        <div class="target-star">⭐ HIGH PRIORITY</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Jeffrey D. Moffett, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Knee</span><span class="spec-tag">Hip</span><span class="spec-tag">Shoulder</span></div>
+        <div class="target-star">⭐ HIGH PRIORITY - Joint Replacement, Sports Medicine, Trauma</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Casey R. Stuhlman, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Knee</span><span class="spec-tag">Hip</span><span class="spec-tag">Shoulder</span><span class="spec-tag">Elbow</span></div>
+        <div class="target-star">⭐ HIGH PRIORITY - Fellowship: Sports/Shoulder/Joint Replacement</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Eric M. Stehly, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Knee</span><span class="spec-tag">Shoulder</span></div>
+      </div>
+      <div class="physician-card">
+        <div class="physician-name">Pat A. Peters, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Knee</span><span class="spec-tag">Ankle</span><span class="spec-tag">Shoulder</span><span class="spec-tag">Elbow</span></div>
+        <div style="font-size:11px; color:var(--gray-text); margin-top:4px;">Founder (1989) - General/Sports</div>
+      </div>
+      <div class="physician-card">
+        <div class="physician-name">Ryan P. Mulligan, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Foot</span><span class="spec-tag">Ankle</span><span class="spec-tag">Knee</span></div>
+      </div>
+      <div class="physician-card">
+        <div class="physician-name">Kristen E. Fleager, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Hand</span><span class="spec-tag">Wrist</span><span class="spec-tag">Elbow</span></div>
+      </div>
+      <div class="physician-card">
+        <div class="physician-name">Michael R. Briseño, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Spine</span><span class="spec-tag">Back</span><span class="spec-tag">Neck</span></div>
+      </div>
+      <div class="physician-card">
+        <div class="physician-name">Melissa Z. Murphy, MD MPH</div>
+        <div class="physician-spec"><span class="spec-tag">Spine</span><span class="spec-tag">Back</span><span class="spec-tag">Neck</span></div>
+      </div>
+      <div class="physician-card">
+        <div class="physician-name">Raul M. Llanos, DO MPH</div>
+        <div class="physician-spec"><span class="spec-tag">Spine</span><span class="spec-tag">Back</span><span class="spec-tag">Neck</span></div>
+      </div>
+      <div class="physician-card">
+        <div class="physician-name">Christopher J. Tucker, DO</div>
+        <div class="physician-spec"><span class="spec-tag">Spine</span><span class="spec-tag">Back</span><span class="spec-tag">Neck</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── ALL-STAR ─── -->
+  <div id="practice-allstar" class="practice-panel">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">All-Star Orthopaedics</div>
+          <div class="card-subtitle">All-Star Orthopaedics · BSW JV Partner · Part of UMP · BQA Tier 1 · Also in SWHR</div>
+        </div>
+        <span class="badge badge-amber">MULTI-LOCATION</span>
+      </div>
+      <div class="grid-2">
+        <div>
+          <div class="info-row"><span class="info-label">📍 Locations</span><span class="info-val">
+            <div class="location-chips">
+              <span class="loc-chip">Irving</span>
+              <span class="loc-chip">Southlake</span>
+              <span class="loc-chip">Flower Mound</span>
+              <span class="loc-chip">Alliance</span>
+            </div>
+          </span></div>
+          <div style="height:8px;"></div>
+          <div class="info-row"><span class="info-label">🏠 Irving</span><span class="info-val">400 W LBJ Fwy, Suite 330, Irving TX 75063</span></div>
+          <div class="info-row"><span class="info-label">📞 Phone</span><span class="info-val">(972) 556-2885</span></div>
+          <div class="info-row"><span class="info-label">👥 Physicians</span><span class="info-val">10 MDs/DOs · 5 NPs/PAs · 5 PTs/OTs/PTAs</span></div>
+          <div class="info-row"><span class="info-label">📍 Locations</span><span class="info-val">4 clinics · 2 rehab locations</span></div>
+          <div class="info-row"><span class="info-label">⭐ BQA Status</span><span class="info-val">8 BSWQA providers - <strong>All Tier 1</strong></span></div>
+          <div class="info-row"><span class="info-label">📨 FY2025 Referrals</span><span class="info-val">608 PCP→UMP referrals · Southlake, IM at Irving/Coppell, Las Colinas, Colleyville, MSCI</span></div>
+          <div class="info-row"><span class="info-label">💊 Insurance</span><span class="info-val">Medicare, Aetna, BCBS, Cigna, Humana, major PPOs</span></div>
+          <div class="info-row"><span class="info-label">🌍 Geography</span><span class="info-val">Irving/Las Colinas, Southlake, Flower Mound, Alliance - spans Tarrant/Dallas/Denton county lines</span></div>
+        </div>
+        <div>
+          <div class="callout callout-green">
+            <div class="callout-title">📊 Demographics &amp; Opportunity</div>
+            Irving/Las Colinas and Flower Mound serve well-established suburban populations with strong Medicare-age demographics. The Flower Mound location creates geographic overlap with Orthopedic Associates - coordinate account coverage carefully. The Southlake location serves one of DFW's highest-income ZIP codes.
+          </div>
+          <div class="callout callout-navy">
+            <div class="callout-title">ACO Note</div>
+            All-Star providers are listed in the <strong>Southwestern Health Resources (SWHR) provider directory</strong> and most are <strong>BQA Tier 1</strong> providers under the Baylor Quality Alliance - BSW's performance network recognizing high-quality, cost-efficient physicians. Under the new BSW–UMP joint venture, cost-of-care performance and readmission prevention directly impact their standing. Home health that prevents readmissions supports both their ACO scores and BQA Tier 1 status.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title" style="font-size:15px; margin-bottom:14px;">Physician Roster</div>
+    <div class="physician-grid">
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Bing S. Tsay, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Joint Replacement</span><span class="spec-tag">General</span></div>
+        <div class="target-star">⭐ Identify joint volume - target for total joint referrals</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Kevin M. Honig, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Joint Replacement</span><span class="spec-tag">General</span></div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Mark S. Greenberg, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Joint Replacement</span><span class="spec-tag">General</span></div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Robert P. Runner, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Joint Replacement</span><span class="spec-tag">General</span></div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Thomas M. Schott, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Joint Replacement</span><span class="spec-tag">General</span></div>
+      </div>
+      <div class="physician-card">
+        <div class="physician-name">W. Grear Hurt, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Sports Medicine</span></div>
+        <div style="font-size:11px; color:var(--gray-text); margin-top:4px;">Texas Health Resources affiliated</div>
+      </div>
+      <div class="physician-card">
+        <div class="physician-name">Brian E. Straus, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Orthopaedic Surgery</span></div>
+      </div>
+    </div>
+    <div class="callout callout-amber" style="margin-top:16px;">
+      <div class="callout-title">⚠️ Action Item</div>
+      All-Star's website lists specialties but doesn't break out individual surgeon focus areas as clearly as NTxOrtho or AOA. Priority is to identify which of the 8 surgeons are doing the highest total joint volume at the Irving and Flower Mound locations. The Irving location (LBJ Fwy) is the primary office - start there.
+    </div>
+  </div>
+
+  <!-- ─── AOA ─── -->
+  <div id="practice-aoa" class="practice-panel">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">AOA Orthopedic Specialists</div>
+          <div class="card-subtitle">Formerly Arlington Orthopedic Associates · Est. 1996 · Largest independent ortho practice in North Texas · Part of UMP</div>
+        </div>
+        <span class="badge badge-red">HIGHEST VOLUME</span>
+      </div>
+      <div class="grid-2">
+        <div>
+          <div class="info-row"><span class="info-label">📍 Locations</span><span class="info-val">
+            <div class="location-chips">
+              <span class="loc-chip">Arlington</span>
+              <span class="loc-chip">Dallas/DeSoto</span>
+              <span class="loc-chip">Irving</span>
+              <span class="loc-chip">Mansfield</span>
+              <span class="loc-chip">Midlothian</span>
+              <span class="loc-chip">Waxahachie</span>
+            </div>
+          </span></div>
+          <div style="height:8px;"></div>
+          <div class="info-row"><span class="info-label">🏠 Arlington</span><span class="info-val">800 Orthopedic Way, Arlington TX 76015 <em>(flagship)</em></span></div>
+          <div class="info-row"><span class="info-label">🏠 Dallas/DeSoto</span><span class="info-val">2716 Travis St, DeSoto TX 75115</span></div>
+          <div class="info-row"><span class="info-label">🏠 Irving</span><span class="info-val">2005 W Park Dr, Suite 100, Irving TX 75061</span></div>
+          <div class="info-row"><span class="info-label">🏠 Mansfield</span><span class="info-val">2801 E Broad St, Mansfield TX 76063</span></div>
+          <div class="info-row"><span class="info-label">🏠 Midlothian</span><span class="info-val">1441 S Midlothian Pkwy, Suite 130, Midlothian TX 76065</span></div>
+          <div class="info-row"><span class="info-label">🏠 Waxahachie</span><span class="info-val">1328 US 287 Bypass, Suite 100, Waxahachie TX 75165</span></div>
+          <div class="info-row"><span class="info-label">📞 Phone</span><span class="info-val">(817) 375-5200</span></div>
+          <div class="info-row"><span class="info-label">👥 Physicians</span><span class="info-val">29 MDs/DOs · 13 NPs/PAs · 43 PTs/OTs/PTAs</span></div>
+          <div class="info-row"><span class="info-label">💊 Insurance</span><span class="info-val">Most commercial, Medicare, Medicare Advantage, SWHR ACO</span></div>
+          <div class="info-row"><span class="info-label">⭐ BQA Status</span><span class="info-val">22 BSWQA providers - <strong>21 Tier 1 · 1 Tier 2</strong></span></div>
+          <div class="info-row"><span class="info-label">📨 FY2025 Referrals</span><span class="info-val"><strong>2,223</strong> PCP→UMP referrals - highest in network · Riverside, IMA Irving, MSCI, Waxahachie, Lakeridge, Midlothian, Mansfield, Red Oak</span></div>
+        </div>
+        <div>
+          <div class="callout callout-red">
+            <div class="callout-title">🎯 Highest Priority Account</div>
+            27 surgeons across 6 locations. Offers robotic hip and knee replacement and robot-assisted spine surgery. The south-of-Arlington corridor (Midlothian, Waxahachie, Mansfield) serves older rural/suburban populations with <strong>very high Medicare demographics</strong> - ideal home health referral generators. This single practice could drive the most volume of any account in the UMP network.
+          </div>
+          <div class="callout callout-teal">
+            <div class="callout-title">Referral Geography Strategy</div>
+            AOA spans Ellis County (Waxahachie, Midlothian) - these patients often don't have easy access to outpatient therapy and are higher Medicare demographic. Lead with these locations. Irving overlaps with All-Star - keep messaging consistent across both accounts.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title" style="font-size:15px; margin-bottom:6px;">Total Joint / Hip &amp; Knee Surgeons - Primary Targets</div>
+    <div class="callout callout-teal" style="margin-bottom:14px;"><div class="callout-title">Focus List</div>These are your highest-priority conversations at AOA. All specialize in joint replacement.</div>
+    <div class="physician-grid">
+      <div class="physician-card joint-focus">
+        <div class="physician-name">David-Alan Rubin, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Hip</span><span class="spec-tag">Knee</span><span class="spec-tag">Joint Replacement</span></div>
+        <div class="target-star">⭐ Arlington, Dallas/DeSoto - Dedicated joint replacement surgeon</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Jonathan Walsh, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Hip</span><span class="spec-tag">Knee</span><span class="spec-tag">Joint Replacement</span></div>
+        <div class="target-star">⭐ Arlington, DeSoto, Irving</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Jason K. Lowry, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Hip</span><span class="spec-tag">Knee</span><span class="spec-tag">Joint Replacement</span></div>
+        <div class="target-star">⭐ Mansfield, Midlothian - High Medicare demographics</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Thad Dean, DO</div>
+        <div class="physician-spec"><span class="spec-tag">Hip</span><span class="spec-tag">Knee</span><span class="spec-tag">Shoulder</span></div>
+        <div class="target-star">⭐ Mansfield, Midlothian</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Jay Pond, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Hip</span><span class="spec-tag">Knee</span><span class="spec-tag">Joint Replacement</span></div>
+        <div class="target-star">⭐ Arlington (flagship)</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Frank Rodriguez, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Hip</span><span class="spec-tag">Knee</span><span class="spec-tag">Joint Replacement</span></div>
+        <div class="target-star">⭐ Arlington, Mansfield</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Marc Roux, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Hip</span><span class="spec-tag">Knee</span><span class="spec-tag">Joint Replacement</span></div>
+        <div class="target-star">⭐ Waxahachie - Ellis County lead</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Josh McSpadden, DO</div>
+        <div class="physician-spec"><span class="spec-tag">Hip</span><span class="spec-tag">Knee</span><span class="spec-tag">Joint Replacement</span></div>
+        <div class="target-star">⭐ Midlothian, Waxahachie</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Clinton Bell, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Hip</span><span class="spec-tag">Knee</span><span class="spec-tag">Full Spectrum</span></div>
+        <div class="target-star">⭐ Dallas/DeSoto, Midlothian</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">John G. Westkaemper, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Hip</span><span class="spec-tag">Knee</span><span class="spec-tag">Full Spectrum</span></div>
+        <div class="target-star">⭐ Multi-location (Arlington, DeSoto, Irving, Midlothian)</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">R. Mills Roberts, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Hip</span><span class="spec-tag">Knee</span><span class="spec-tag">Full Spectrum</span></div>
+        <div class="target-star">⭐ Irving</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Jesus Rey II, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Knee</span><span class="spec-tag">Joint Replacement</span><span class="spec-tag">Sports</span></div>
+        <div class="target-star">Arlington, Dallas/DeSoto</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">James W. Burnett, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Knee</span><span class="spec-tag">Joint Replacement</span></div>
+        <div class="target-star">Arlington</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Andrew Freese, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Hip</span><span class="spec-tag">Knee</span><span class="spec-tag">Sports</span></div>
+        <div class="target-star">Arlington, DeSoto, Irving</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Mark Kazewych, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Hip</span><span class="spec-tag">Knee</span><span class="spec-tag">Shoulder</span></div>
+        <div class="target-star">Arlington, Mansfield</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Adam Crawford, MD</div>
+        <div class="physician-spec"><span class="spec-tag">Foot</span><span class="spec-tag">Knee</span><span class="spec-tag">Joint Replacement</span></div>
+        <div class="target-star">Arlington, Irving, Mansfield</div>
+      </div>
+    </div>
+    <div style="margin-top:16px;" class="section-title" style="font-size:14px;">Other Specialties at AOA</div>
+    <div class="physician-grid" style="margin-top:10px;">
+      <div class="physician-card"><div class="physician-name">Timothy Choi, MD</div><div class="physician-spec"><span class="spec-tag">Spine</span></div><div style="font-size:11px; color:var(--gray-text); margin-top:3px;">DeSoto, Midlothian, Waxahachie</div></div>
+      <div class="physician-card"><div class="physician-name">Ryan Murphy, MD</div><div class="physician-spec"><span class="spec-tag">Spine</span></div><div style="font-size:11px; color:var(--gray-text); margin-top:3px;">Arlington, Irving, Mansfield</div></div>
+      <div class="physician-card"><div class="physician-name">Eric Wieser, MD</div><div class="physician-spec"><span class="spec-tag">Spine</span><span class="spec-tag">Sports</span></div><div style="font-size:11px; color:var(--gray-text); margin-top:3px;">Arlington, Mansfield</div></div>
+      <div class="physician-card"><div class="physician-name">Todd Daniels, MD</div><div class="physician-spec"><span class="spec-tag">PM&amp;R</span><span class="spec-tag">Multi</span></div><div style="font-size:11px; color:var(--gray-text); margin-top:3px;">Arlington</div></div>
+      <div class="physician-card"><div class="physician-name">Troy Foster, DO</div><div class="physician-spec"><span class="spec-tag">PM&amp;R</span><span class="spec-tag">Multi</span></div><div style="font-size:11px; color:var(--gray-text); margin-top:3px;">Mansfield</div></div>
+      <div class="physician-card"><div class="physician-name">Shiv Patel, MD</div><div class="physician-spec"><span class="spec-tag">PM&amp;R</span><span class="spec-tag">Multi</span></div><div style="font-size:11px; color:var(--gray-text); margin-top:3px;">DeSoto, Irving, Waxahachie</div></div>
+      <div class="physician-card"><div class="physician-name">Cameron Atkinson, MD</div><div class="physician-spec"><span class="spec-tag">Hand</span><span class="spec-tag">Wrist</span><span class="spec-tag">Sports</span></div><div style="font-size:11px; color:var(--gray-text); margin-top:3px;">Arlington, Irving, Mansfield</div></div>
+      <div class="physician-card"><div class="physician-name">Donald Stewart, MD</div><div class="physician-spec"><span class="spec-tag">Foot</span><span class="spec-tag">Ankle</span><span class="spec-tag">Sports</span></div><div style="font-size:11px; color:var(--gray-text); margin-top:3px;">Arlington, Mansfield</div></div>
+      <div class="physician-card"><div class="physician-name">John Drkulec, MD</div><div class="physician-spec"><span class="spec-tag">Knee</span><span class="spec-tag">Sports</span></div><div style="font-size:11px; color:var(--gray-text); margin-top:3px;">Mansfield</div></div>
+      <div class="physician-card"><div class="physician-name">Joseph H. Kay Jr., MD</div><div class="physician-spec"><span class="spec-tag">Full Spectrum</span><span class="spec-tag">PM&amp;R</span></div><div style="font-size:11px; color:var(--gray-text); margin-top:3px;">Arlington, Mansfield</div></div>
+      <div class="physician-card"><div class="physician-name">Chris Hopkins, MD</div><div class="physician-spec"><span class="spec-tag">Hand</span><span class="spec-tag">Wrist</span><span class="spec-tag">Elbow</span></div><div style="font-size:11px; color:var(--gray-text); margin-top:3px;">Arlington, Mansfield</div></div>
+    </div>
+  </div>
+
+  <!-- ─── ORTHOTEXAS ─── -->
+  <div id="practice-otx" class="practice-panel">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">OrthoTexas Physicians and Surgeons</div>
+          <div class="card-subtitle">OrthoTexas · Part of UMP · 40+ years in practice · Collin/Denton County growth corridor</div>
+        </div>
+        <span class="badge badge-green">GROWTH MARKET</span>
+      </div>
+      <div class="grid-2">
+        <div>
+          <div class="info-row"><span class="info-label">📍 Locations</span><span class="info-val">
+            <div class="location-chips">
+              <span class="loc-chip">Carrollton</span>
+              <span class="loc-chip">Frisco</span>
+              <span class="loc-chip">Plano</span>
+              <span class="loc-chip">Denton</span>
+            </div>
+          </span></div>
+          <div style="height:8px;"></div>
+          <div class="info-row"><span class="info-label">🏥 Surgery Ctr</span><span class="info-val">1 on-site surgery center</span></div>
+          <div class="info-row"><span class="info-label">👥 Physicians</span><span class="info-val">12 MDs/DOs · 8 NPs/PAs · 25 PTs/OTs/PTAs/ATs</span></div>
+          <div class="info-row"><span class="info-label">📍 Locations</span><span class="info-val">4 clinics · 3 rehab locations</span></div>
+          <div class="info-row"><span class="info-label">🏋️ In-house Rehab</span><span class="info-val">Yes - 25 PTs/OTs/PTAs/ATs across 3 rehab sites. High self-referral likelihood post-op.</span></div>
+          <div class="info-row"><span class="info-label">⭐ BQA Status</span><span class="info-val">9 BSWQA providers - 8 Tier 1 · 3 Tier 2</span></div>
+          <div class="info-row"><span class="info-label">📨 FY2025 Referrals</span><span class="info-val">186 PCP→UMP referrals · Castle Hills, The Star, Flower Mound, DDA Plano - <em>lowest relative to network size</em></span></div>
+          <div class="info-row"><span class="info-label">🌍 Geography</span><span class="info-val">Frisco, Plano, Carrollton, Denton - fastest-growing Medicare population in Texas</div>
+        </div>
+        <div>
+          <div class="callout callout-green">
+            <div class="callout-title">📊 Demographics &amp; Opportunity</div>
+            Frisco, Plano, and Carrollton are in one of the fastest-growing suburban corridors in the country. The baby boomer wave aging into Medicare is hitting Collin County hard - total joint volume is rising year-over-year. OrthoTexas has been recognized by D Magazine as Best Doctors in both Dallas and Collin County for <strong>13+ consecutive years.</strong>
+          </div>
+          <div class="callout callout-amber">
+            <div class="callout-title">Insurance Mix Note</div>
+            Frisco/Plano skews slightly younger with higher commercial insurance concentration relative to the south-Arlington markets. However, Medicare volume is growing rapidly. Also in the SWHR ACO network and most providers hold <strong>BQA Tier 1 status</strong> - under the new BSW–UMP JV, cost-of-care performance and readmission prevention are even more central to how these physicians are evaluated and compensated.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title" style="font-size:15px; margin-bottom:14px;">Physician Roster</div>
+    <div class="physician-grid">
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Dr. Adam L. Kouyoumjian</div>
+        <div class="physician-spec"><span class="spec-tag">Total Joint</span><span class="spec-tag">Sports</span><span class="spec-tag">Shoulder</span></div>
+        <div class="target-star">⭐ PRIMARY TARGET - Frisco, Plano - Minimally invasive total joint replacement</div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Dr. Khalid Yousuf</div>
+        <div class="physician-spec"><span class="spec-tag">Hip Reconstruction</span><span class="spec-tag">Knee Reconstruction</span></div>
+        <div class="target-star">⭐ HIGH PRIORITY - Hip/knee focus, Dallas/Frisco/McKinney</div>
+      </div>
+      <div class="physician-card">
+        <div class="physician-name">Dr. Mitchell F. Fagelman</div>
+        <div class="physician-spec"><span class="spec-tag">Shoulder</span><span class="spec-tag">Elbow Replacement</span></div>
+      </div>
+      <div class="physician-card">
+        <div class="physician-name">Dr. Victoria D. Knoll</div>
+        <div class="physician-spec"><span class="spec-tag">Hand</span><span class="spec-tag">Wrist</span></div>
+        <div style="font-size:11px; color:var(--gray-text); margin-top:3px;">Multiple D Magazine Best Doctor awards</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── OAFM ─── -->
+  <div id="practice-oafm" class="practice-panel">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Orthopedic Associates of Flower Mound</div>
+          <div class="card-subtitle">OAFM · Est. 1976 · 11 board-certified physicians · BSW JV Partner · Part of UMP · <span style="color:var(--amber); font-weight:700;">BQA Non-QA</span> · In SWHR network</div>
+        </div>
+        <span class="badge badge-teal">HIGH OPPORTUNITY</span>
+      </div>
+      <div class="grid-2">
+        <div>
+          <div class="info-row"><span class="info-label">📍 Locations</span><span class="info-val">
+            <div class="location-chips">
+              <span class="loc-chip">Flower Mound</span>
+              <span class="loc-chip">Northlake</span>
+            </div>
+          </span></div>
+          <div style="height:8px;"></div>
+          <div class="info-row"><span class="info-label">🏠 Flower Mound</span><span class="info-val">5000 Long Prairie Rd, Suite 100, Flower Mound TX 75028</span></div>
+          <div class="info-row"><span class="info-label">📞 Phone</span><span class="info-val">(972) 420-1776</span></div>
+          <div class="info-row"><span class="info-label">🏥 Surgery Ctr</span><span class="info-val">On-site surgical center, Flower Mound</span></div>
+          <div class="info-row"><span class="info-label">👥 Physicians</span><span class="info-val">11 MDs/DOs · 3 NPs/PAs · 6 Surgical Assistants</span></div>
+          <div class="info-row"><span class="info-label">📍 Locations</span><span class="info-val">2 clinics · <strong style="color:var(--red);">0 in-house rehab locations</strong></span></div>
+          <div class="info-row"><span class="info-label">⭐ BQA Status</span><span class="info-val"><span style="color:var(--amber); font-weight:700;">Non-QA</span> - 9 providers not yet integrated into BSWQA tier structure (new JV, integration pending)</span></div>
+          <div class="info-row"><span class="info-label">📨 FY2025 Referrals</span><span class="info-val">293 PCP→UMP referrals · Highland Village, Flower Mound</span></div>
+          <div class="info-row"><span class="info-label">🌍 Geography</span><span class="info-val">Flower Mound, Highland Village, Argyle, Northlake, Lewisville - NW Denton County</span></div>
+        </div>
+        <div>
+          <div class="callout callout-green">
+            <div class="callout-title">📊 Demographics &amp; Opportunity</div>
+            Affluent suburban market with strong commercial insurance and a growing Medicare-age population. Flower Mound is the geographic center between the Alliance/Keller (NTxOrtho) and Irving (All-Star) accounts. Dr. Timothy Harris is a fellowship-trained dedicated hip/knee reconstruction surgeon - he is your <strong>primary contact at this practice.</strong>
+            <br><br>
+            <strong style="color:var(--green);">🎯 Key Strategic Advantage:</strong> OAFM has <strong>zero in-house rehab locations</strong> - confirmed by the Baylor partnership presentation. Unlike every other practice in this network, they have no PT department competing for post-op referrals. Their surgical patients have no default in-house therapy option. This makes OAFM your cleanest, most immediate home health referral opportunity in the entire UMP network.
+          </div>
+          <div class="callout callout-amber">
+            <div class="callout-title">⚠️ BSW/Luna Exposure - Navigating the JV Relationship</div>
+            OAFM is now an official Baylor JV partner, though their 9 providers are currently listed as <strong>Non-QA</strong> in the BSWQA system - meaning they have not yet been incorporated into the Quality Alliance tier structure. This is an important nuance: the JV relationship is new and the integration is still developing. The BSW/Luna "Therapy at Home" pitch may be part of the BSW value-add to this partnership. Lead with the <strong>$0 patient cost, the nursing component, and the readmission prevention argument</strong> - all three stand regardless of QA tier status.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title" style="font-size:15px; margin-bottom:14px;">Physician Roster</div>
+    <div class="physician-grid">
+      <div class="physician-card joint-focus">
+        <div class="physician-name">Dr. Timothy Harris</div>
+        <div class="physician-spec"><span class="spec-tag">Hip</span><span class="spec-tag">Knee</span><span class="spec-tag">Reconstruction</span></div>
+        <div class="target-star">⭐ PRIMARY TARGET - Adult Hip &amp; Knee Reconstruction Fellowship (Texas Hip &amp; Knee, Fort Worth)</div>
+      </div>
+      <div class="physician-card">
+        <div class="physician-name">Dr. Trevor Bouck</div>
+        <div class="physician-spec"><span class="spec-tag">Shoulder</span><span class="spec-tag">Sports Medicine</span></div>
+      </div>
+      <div class="physician-card">
+        <div class="physician-name">Dr. Heerwagen</div>
+        <div class="physician-spec"><span class="spec-tag">General Orthopaedics</span></div>
+      </div>
+      <div class="physician-card">
+        <div class="physician-name">Dr. Wilkofsky</div>
+        <div class="physician-spec"><span class="spec-tag">General Orthopaedics</span></div>
+      </div>
+      <div class="physician-card">
+        <div class="physician-name">Dr. Evanich</div>
+        <div class="physician-spec"><span class="spec-tag">General Orthopaedics</span></div>
+      </div>
+      <div class="physician-card joint-focus">
+        <div class="physician-name">3 Additional Surgeons</div>
+        <div class="physician-spec"><span class="spec-tag">Recently Added</span></div>
+        <div class="target-star">Practice recently expanded - verify current roster on-site</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB 3: TOTAL JOINT QUICK REF -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="tab-joints" class="tab-content">
+  <div class="section-title">Total Joint Surgeon Quick Reference</div>
+  <div class="section-sub">All hip &amp; knee replacement-focused surgeons across the UMP network - sorted by priority</div>
+
+  <div class="callout callout-amber">
+    <div class="callout-title">How to Use This Table</div>
+    These are your primary referral conversations for home health. Surgeons who focus on total joints (hip/knee replacement) generate the most post-surgical home health volume. Prioritize physicians marked ⭐ first.
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Surgeon</th>
+          <th>Practice</th>
+          <th>Location(s)</th>
+          <th>Joint Focus</th>
+          <th>Priority</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight-row">
+          <td><strong>Nathan E. Williams II, MD</strong></td>
+          <td>NTxOrtho</td>
+          <td>Grapevine / Keller</td>
+          <td>Hip, Knee - Adult Lower Extremity Reconstruction Fellowship</td>
+          <td>⭐ Primary</td>
+        </tr>
+        <tr class="highlight-row">
+          <td><strong>Timothy Harris, MD</strong></td>
+          <td>OAFM</td>
+          <td>Flower Mound / Northlake</td>
+          <td>Hip, Knee - Adult Hip &amp; Knee Reconstruction Fellowship</td>
+          <td>⭐ Primary</td>
+        </tr>
+        <tr class="highlight-row">
+          <td><strong>David-Alan Rubin, MD</strong></td>
+          <td>AOA</td>
+          <td>Arlington, DeSoto</td>
+          <td>Hip, Knee - Dedicated Joint Replacement</td>
+          <td>⭐ Primary</td>
+        </tr>
+        <tr class="highlight-row">
+          <td><strong>Jonathan Walsh, MD</strong></td>
+          <td>AOA</td>
+          <td>Arlington, DeSoto, Irving</td>
+          <td>Hip, Knee, Joint Replacement</td>
+          <td>⭐ Primary</td>
+        </tr>
+        <tr>
+          <td>Kerry M. Donegan, MD</td>
+          <td>NTxOrtho</td>
+          <td>Grapevine / Keller</td>
+          <td>Hip, Knee, Shoulder</td>
+          <td>High</td>
+        </tr>
+        <tr>
+          <td>Jeffrey D. Moffett, MD</td>
+          <td>NTxOrtho</td>
+          <td>Grapevine / Keller</td>
+          <td>Hip, Knee, Shoulder, Trauma</td>
+          <td>High</td>
+        </tr>
+        <tr>
+          <td>Casey R. Stuhlman, MD</td>
+          <td>NTxOrtho</td>
+          <td>Grapevine / Keller</td>
+          <td>Hip, Knee, Shoulder, Elbow</td>
+          <td>High</td>
+        </tr>
+        <tr>
+          <td>Adam L. Kouyoumjian, MD</td>
+          <td>OrthoTexas</td>
+          <td>Frisco, Plano</td>
+          <td>Total Joint, Sports, Shoulder</td>
+          <td>High</td>
+        </tr>
+        <tr>
+          <td>Khalid Yousuf, MD</td>
+          <td>OrthoTexas</td>
+          <td>Dallas, Frisco, McKinney</td>
+          <td>Hip Reconstruction, Knee Reconstruction</td>
+          <td>High</td>
+        </tr>
+        <tr>
+          <td>Jason K. Lowry, MD</td>
+          <td>AOA</td>
+          <td>Mansfield, Midlothian</td>
+          <td>Hip, Knee, Joint Replacement</td>
+          <td>High - Medicare demographics</td>
+        </tr>
+        <tr>
+          <td>Thad Dean, DO</td>
+          <td>AOA</td>
+          <td>Mansfield, Midlothian</td>
+          <td>Hip, Knee, Shoulder</td>
+          <td>High - Medicare demographics</td>
+        </tr>
+        <tr>
+          <td>Marc Roux, MD</td>
+          <td>AOA</td>
+          <td>Waxahachie</td>
+          <td>Hip, Knee, Full Spectrum</td>
+          <td>High - Ellis County lead</td>
+        </tr>
+        <tr>
+          <td>Josh McSpadden, DO</td>
+          <td>AOA</td>
+          <td>Midlothian, Waxahachie</td>
+          <td>Hip, Knee, Full Spectrum</td>
+          <td>High</td>
+        </tr>
+        <tr>
+          <td>Jay Pond, MD</td>
+          <td>AOA</td>
+          <td>Arlington</td>
+          <td>Hip, Knee, Joint Replacement</td>
+          <td>Standard</td>
+        </tr>
+        <tr>
+          <td>Frank Rodriguez, MD</td>
+          <td>AOA</td>
+          <td>Arlington, Mansfield</td>
+          <td>Hip, Knee, Joint Replacement</td>
+          <td>Standard</td>
+        </tr>
+        <tr>
+          <td>Clinton Bell, MD</td>
+          <td>AOA</td>
+          <td>DeSoto, Midlothian</td>
+          <td>Full Spectrum, Hip, Knee</td>
+          <td>Standard</td>
+        </tr>
+        <tr>
+          <td>John G. Westkaemper, MD</td>
+          <td>AOA</td>
+          <td>Arlington, DeSoto, Irving, Midlothian</td>
+          <td>Full Spectrum, Joint Replacement</td>
+          <td>Standard</td>
+        </tr>
+        <tr>
+          <td>R. Mills Roberts, MD</td>
+          <td>AOA</td>
+          <td>Irving</td>
+          <td>Full Spectrum, Joint Replacement</td>
+          <td>Standard</td>
+        </tr>
+        <tr>
+          <td>Eric M. Stehly, MD</td>
+          <td>NTxOrtho</td>
+          <td>Grapevine / Keller</td>
+          <td>Knee, Shoulder</td>
+          <td>Standard</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB 4: DALLAS VA -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="tab-va" class="tab-content">
+  <div class="section-title">VA North Texas Health Care System</div>
+  <div class="section-sub">Building the metroplex VA relationship - leveraging your Central Texas TriWest strength</div>
+
+  <div class="stat-row">
+    <div class="stat-box"><div class="stat-number">113K+</div><div class="stat-label">Veterans Served</div></div>
+    <div class="stat-box"><div class="stat-number">38</div><div class="stat-label">Texas Counties</div></div>
+    <div class="stat-box"><div class="stat-number">1.4M</div><div class="stat-label">Outpatient Episodes/Yr</div></div>
+    <div class="stat-box"><div class="stat-number">853</div><div class="stat-label">Beds (Dallas VAMC)</div></div>
+    <div class="stat-box"><div class="stat-number">4,700</div><div class="stat-label">System Employees</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px;">📍 Facility Locations</div>
+        <div class="va-location">
+          <div class="va-icon">🏥</div>
+          <div>
+            <div class="va-name">Dallas VA Medical Center <span class="badge badge-navy" style="margin-left:6px;">MAIN HOSPITAL</span></div>
+            <div class="va-addr">4500 S. Lancaster Rd, Dallas TX 75216</div>
+            <div class="va-phone">(214) 742-8387</div>
+            <div class="va-addr" style="margin-top:3px;">853 beds · Spinal Cord Injury Center · Community Living Center · HBPC · Surgical Services</div>
+          </div>
+        </div>
+        <div class="va-location">
+          <div class="va-icon">🏥</div>
+          <div>
+            <div class="va-name">Garland VA Medical Center <span class="badge badge-navy" style="margin-left:6px;">SECONDARY HOSPITAL</span></div>
+            <div class="va-addr">2300 Marie Curie Blvd, Garland TX 75042</div>
+            <div class="va-addr" style="margin-top:3px;">Key inpatient/outpatient hub for east Dallas County</div>
+          </div>
+        </div>
+        <div class="va-location">
+          <div class="va-icon">🏢</div>
+          <div>
+            <div class="va-name">Fort Worth VA Clinic (CBOC)</div>
+            <div class="va-addr">2201 SE Loop 820, Fort Worth TX 76119</div>
+            <div class="va-phone">(817) 730-0000</div>
+          </div>
+        </div>
+        <div class="va-location">
+          <div class="va-icon">🏢</div>
+          <div>
+            <div class="va-name">Plano VA Clinic / Sam Johnson Memorial CBOC</div>
+            <div class="va-addr">3804 W 15th St, Suite 175, Plano TX 75075</div>
+            <div class="va-phone">(972) 801-4200</div>
+          </div>
+        </div>
+        <div class="va-location">
+          <div class="va-icon">🏢</div>
+          <div>
+            <div class="va-name">Denton VA Clinic (CBOC)</div>
+            <div class="va-addr">2322 San Jacinto Blvd, Denton TX 76205</div>
+            <div class="va-phone">(940) 891-6350</div>
+          </div>
+        </div>
+        <div class="va-location">
+          <div class="va-icon">🏢</div>
+          <div>
+            <div class="va-name">Granbury CBOC</div>
+            <div class="va-addr">Granbury, TX</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="callout callout-teal">
+        <div class="callout-title">TriWest CCN - Your Foot in the Door</div>
+        Texas falls under <strong>TriWest CCN Region 4.</strong> Already verified as listed and visible in the DFW CCN network. Currently working on consolidating the provider name across the state CCN and TRICARE network following the AccentCare rebrand. TriWest provider line: <strong>877-CCN-TRIW (877-226-8749)</strong>, Mon–Fri 8am–6pm local time.
+        <br><br>
+        <strong>Care in the Community Main Line: <span style="color:#ff1493;">469-797-2101</span></strong><br>
+        <span style="font-size:12px;">⏰ Call in the morning - per VA staff, the line gets congested as the day goes on. Earlier is better for reaching someone quickly.</span>
+      </div>
+      <div class="callout callout-amber">
+        <div class="callout-title">⚠️ The Metroplex Gap</div>
+        Your strong Central Texas VA relationships have not translated to the metroplex yet. The VA North Texas system is significantly larger - 113,000 veterans vs. Central Texas's footprint. The HBPC (Home Based Primary Care) program maintains waitlists and geographic coverage gaps, which creates consistent referral flow to TriWest CCN providers. You need to be visible to the Community Care Coordinators at both the Dallas VAMC <em>and</em> the CBOCs - not just the main campus.
+      </div>
+      <div class="callout callout-green">
+        <div class="callout-title">Veteran Demographic Profile</div>
+        <ul class="bullet-list" style="margin:0;">
+          <li>Heavily concentrated in Tarrant County (Fort Worth side) and eastern Dallas County</li>
+          <li>Vietnam-era / Cold War-era veterans (ages 60–80+) = highest home health utilization</li>
+          <li>Primary home health drivers: joint replacement, diabetes-related wound care, CHF, post-surgical recovery</li>
+          <li>Post-9/11 veterans = younger, active, different care needs</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="section-title">How VA Home Health Referrals Flow</div>
+  <div class="section-sub">The TriWest CCN referral process - step by step</div>
+
+  <div class="card">
+    <div style="display:flex; gap:0; flex-wrap:wrap;">
+      <div style="flex:1; min-width:200px; padding:14px 18px; border-right:1px solid var(--gray-mid);">
+        <div style="font-weight:800; font-size:22px; color:var(--teal);">1</div>
+        <div style="font-weight:700; color:var(--navy); margin-bottom:4px;">VA Provider Identifies Need</div>
+        <div style="font-size:12px; color:var(--gray-text);">Discharge planner or provider at Dallas VAMC, Garland, or CBOC determines veteran needs home health</div>
+      </div>
+      <div style="flex:1; min-width:200px; padding:14px 18px; border-right:1px solid var(--gray-mid);">
+        <div style="font-weight:800; font-size:22px; color:var(--teal);">2</div>
+        <div style="font-weight:700; color:var(--navy); margin-bottom:4px;">Community Care Check</div>
+        <div style="font-size:12px; color:var(--gray-text);">VA Community Care Office determines if in-house HBPC can serve the veteran within MISSION Act access standards. If not → CCN referral</div>
+      </div>
+      <div style="flex:1; min-width:200px; padding:14px 18px; border-right:1px solid var(--gray-mid);">
+        <div style="font-weight:800; font-size:22px; color:var(--teal);">3</div>
+        <div style="font-weight:700; color:var(--navy); margin-bottom:4px;">TriWest Issues Authorization</div>
+        <div style="font-size:12px; color:var(--gray-text);">TriWest identifies approved community provider, issues service authorization specifying type of care, frequency, and duration</div>
+      </div>
+      <div style="flex:1; min-width:200px; padding:14px 18px;">
+        <div style="font-weight:800; font-size:22px; color:var(--teal);">4</div>
+        <div style="font-weight:700; color:var(--navy); margin-bottom:4px;">Provider Receives &amp; Schedules</div>
+        <div style="font-size:12px; color:var(--gray-text);">VA schedules or veteran self-schedules with authorized provider. Medical records included in referral packet.</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="section-title">Your Action Plan - Breaking into the Metroplex VA</div>
+  <div class="card">
+    <div class="tp-item">
+      <div class="tp-num">1</div>
+      <div class="tp-text"><span class="tp-strong" style="color:var(--green);">✅ COMPLETE - DFW CCN listing verified.</span> Confirmed active and visible in the TriWest CCN network for the DFW geographic area. Currently in process of consolidating provider name (AccentCare rebrand) across the state CCN and TRICARE network. To reach TriWest directly: <strong>877-226-8749</strong>, Mon–Fri 8am–6pm. Care in the Community main line: <strong><span style="color:#ff1493;">469-797-2101</span></strong> (call mornings - line congests through the day).</div>
+    </div>
+    <div class="tp-item">
+      <div class="tp-num">2</div>
+      <div class="tp-text"><span class="tp-strong">Target Community Care Coordinators - not just the main campus.</span> The Dallas VAMC (Lancaster Rd) is the hub, but CBOC community care coordinators at Plano, Fort Worth, and Denton are making referral decisions for their covered areas. A post-surgical orthopedic patient in Keller seeing a VA surgeon at the Fort Worth CBOC gets referred out of that CBOC, not Dallas main.</div>
+    </div>
+    <div class="tp-item">
+      <div class="tp-num">3</div>
+      <div class="tp-text"><span class="tp-strong">Bring your Central Texas performance data.</span> Outcomes, readmission rates, response time to authorization, CAHPS scores - whatever you have. The VA Community Care Office responds to providers with proven CCN track records. Your Central Texas relationship is your differentiator. Frame it as: "We already perform at this level under TriWest in [market] - here's the data."</div>
+    </div>
+    <div class="tp-item">
+      <div class="tp-num">4</div>
+      <div class="tp-text"><span class="tp-strong">Home health billing under VA CCN uses Medicare's PDGM model</span> for skilled bundled care and fee-for-service for unbundled. Skilled expanded care (private duty nursing for highly dependent veterans) is also available. Know which billing pathway you're using for each authorization type.</div>
+    </div>
+    <div class="tp-item">
+      <div class="tp-num">5</div>
+      <div class="tp-text"><span class="tp-strong">Post-discharge urgency is your opening.</span> Veterans being discharged from Dallas VAMC, Medical City Dallas, or Medical City Richardson after joint replacement, orthopedic trauma, or surgery need immediate home health follow-up. VA HBPC often cannot respond fast enough. Same-day/next-day capability is a competitive advantage - make sure your coordinator communicates this to the referral source.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB 5: COMPETITION -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="tab-competition" class="tab-content">
+  <div class="section-title">Therapy at Home Competition - BSW / Luna</div>
+  <div class="section-sub">Understanding the competitive model, billing mechanics, and your counter-argument</div>
+
+  <div class="callout callout-amber">
+    <div class="callout-title">⚠️ Who Is Doing This</div>
+    The specific "Therapy at Home" program is <strong>Baylor Scott &amp; White Institute for Rehabilitation's "Outpatient at Home"</strong> service, operated through a partnership with <strong>Luna</strong> - a venture-backed on-demand physical therapy company. Luna matches patients with therapists who travel to the home. BSW/Luna markets this throughout most of North Texas via the BSW physician network.
+  </div>
+
+  <hr class="divider">
+  <div class="section-title">How They Bill - The Mechanics</div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px; color:var(--amber);">🔶 BSW / Luna Model - Outpatient Part B</div>
+      <ul class="bullet-list">
+        <li>Bills Medicare <strong>Part B outpatient</strong> using standard CPT codes</li>
+        <li>Place of Service code: <strong>12 (Home)</strong></li>
+        <li>Claims filed on CMS-1500 form - same as clinic billing</li>
+        <li>Reimbursed at <strong>Medicare Physician Fee Schedule (MPFS)</strong> rates - same as a brick-and-mortar clinic</li>
+        <li>No facility overhead requirement to bill POS 12 - CMS doesn't distinguish</li>
+        <li>Lower overhead for BSW/Luna (no building, equipment) = high margins</li>
+        <li class="highlight">CANNOT bill alongside home health (Part A) for the same patient at the same time</li>
+        <li>No homebound requirement - available to a broader patient population</li>
+        <li>Therapy only - PT, OT, SLP. No nursing. No clinician-supported ADL assistance.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px; color:var(--teal);">✅ Your Model - Home Health Benefit</div>
+      <ul class="bullet-list">
+        <li>Bills through <strong>Medicare home health benefit</strong> - Part A or Part B</li>
+        <li>Reimbursed via <strong>PDGM</strong> (Patient-Driven Groupings Model) - bundled 30-day periods</li>
+        <li>One payment covers all disciplines: nursing + PT + OT - clinicians address ADLs directly</li>
+        <li>Patient cost: <strong>$0 - Medicare covers 100%</strong></li>
+        <li class="highlight">Skilled nursing included in plan of care - catches post-op complications</li>
+        <li>Homebound status required - typically met immediately post-surgery</li>
+        <li>Cannot run simultaneously with outpatient Part B therapy billing</li>
+        <li>Strong compliance and documentation requirements (OASIS, plan of care, physician certification)</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="section-title">Patient Financial Impact</div>
+  <div class="section-sub">This is your strongest talking point with patients and sometimes with physicians who care about patient experience</div>
+
+  <div class="table-wrap" style="margin-bottom:20px;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Factor</th>
+          <th>Home Health (Your Model)</th>
+          <th>Outpatient Therapy at Home (BSW/Luna)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Patient Cost</strong></td>
+          <td style="color:var(--green); font-weight:700;">$0 - Medicare pays 100%</td>
+          <td style="color:var(--red); font-weight:700;">20% coinsurance + $283 deductible (2026)</td>
+        </tr>
+        <tr>
+          <td><strong>Typical Out-of-Pocket (16-visit episode)</strong></td>
+          <td style="color:var(--green); font-weight:700;">$0</td>
+          <td style="color:var(--red); font-weight:700;">~$550 – $750 depending on deductible status</td>
+        </tr>
+        <tr>
+          <td><strong>Out-of-Pocket Maximum</strong></td>
+          <td>No max needed - no cost share</td>
+          <td style="color:var(--red);">No cap under Original Medicare - costs accumulate</td>
+        </tr>
+        <tr>
+          <td><strong>Medicare Advantage</strong></td>
+          <td>Covered per MA plan terms</td>
+          <td>Per-visit copays may apply under MA - varies by plan</td>
+        </tr>
+        <tr>
+          <td><strong>Nursing Included</strong></td>
+          <td style="color:var(--green); font-weight:700;">✅ Yes - skilled nursing + therapy in one plan of care</td>
+          <td style="color:var(--red); font-weight:700;">❌ No - therapy only</td>
+        </tr>
+        <tr>
+          <td><strong>Homebound Requirement</strong></td>
+          <td>Yes - typically met immediately post-TKA/THA</td>
+          <td>No homebound requirement</td>
+        </tr>
+        <tr>
+          <td><strong>Can Run Simultaneously with the Other?</strong></td>
+          <td colspan="2" style="text-align:center; color:var(--red); font-weight:700;">❌ No - these two billing models cannot overlap for the same patient at the same time</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="divider">
+  <div class="section-title">Your Talking Points for Physicians</div>
+  <div class="card">
+    <div class="tp-item">
+      <div class="tp-num">1</div>
+      <div class="tp-text"><span class="tp-strong">Patient cost matters - and it's significant.</span> A typical post-total joint patient receiving 16 visits of BSW/Luna outpatient therapy will owe $550–$750 out of pocket on top of their surgical co-insurance. Your home health patients pay $0. For a patient on a fixed income, this is a real decision factor. Ask the surgeon: "Would you rather your patients receive equivalent or better care with no out-of-pocket expense, or have them pay $600+ and not tell you they're skipping visits because of cost?"</div>
+    </div>
+    <div class="tp-item">
+      <div class="tp-num">2</div>
+      <div class="tp-text"><span class="tp-strong">We provide nursing. They don't.</span> BSW/Luna sends a therapist. You send a nurse and a therapist. For post-surgical patients, nursing catches the complications that send them back to the OR or the ER - DVT signs, wound dehiscence, fever, abnormal drainage, medication issues. One caught complication saves the surgeon a readmission, a potential liability issue, and a patient outcome that shows up in their quality data.</div>
+    </div>
+    <div class="tp-item">
+      <div class="tp-num">3</div>
+      <div class="tp-text"><span class="tp-strong">Their therapy and our home health cannot overlap - the choice happens at discharge.</span> This is a crucial nuance. A patient can't be on both a home health plan of care (Part A) AND receiving outpatient therapy at home (Part B) simultaneously. The referral decision made at the hospital or surgery center is the decision. If BSW/Luna gets there first, you don't. Position with the discharge planner and surgical coordinator, not just the physician.</div>
+    </div>
+    <div class="tp-item">
+      <div class="tp-num">4</div>
+      <div class="tp-text"><span class="tp-strong">The "why" behind billing outpatient from the home.</span> If a surgeon asks why BSW/Luna can bill outpatient rates without a clinic - it's a fair and somewhat unresolved policy question. CMS allows POS 12 billing (home) at the same MPFS rate as a clinic. There's no overhead requirement in the fee schedule. What this means: BSW/Luna has dramatically lower costs than a clinic but collects the same reimbursement. That's a profitable model for them, not a benefit to the patient or the payer.</div>
+    </div>
+    <div class="tp-item">
+      <div class="tp-num">5</div>
+      <div class="tp-text"><span class="tp-strong">We are appropriate for the post-surgical window. They are not.</span> Outpatient therapy at home is technically intended for patients who are <em>not</em> homebound but want convenience. A fresh post-TKA or THA patient typically IS homebound. Home health is the clinically appropriate care pathway for the first 30-60 days. BSW/Luna's model makes more sense as a post-home health step-down, not a replacement for it.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TAB 6: CMS COST ANALYSIS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div id="tab-cms" class="tab-content">
+  <div class="section-title">CMS Cost Analysis - Home Health vs. Outpatient Therapy at Home</div>
+  <div class="section-sub">What Medicare actually pays - and why it matters to surgeons in a bundled payment world</div>
+
+  <div class="callout callout-navy">
+    <div class="callout-title">Bottom Line Up Front</div>
+    Outpatient therapy at home costs CMS approximately <strong>$500–$2,000 less per episode</strong> than traditional home health. That gap is real - but it's also the reason your argument needs to go deeper than cost. The critical counter: that savings evaporates with one readmission. Under the incoming CJR-X bundled payment model, readmissions hit the surgeon's bottom line, not CMS's.
+  </div>
+
+  <hr class="divider">
+  <div class="section-title">2026 Rate Reference - CPT Codes (MPFS)</div>
+  <div class="section-sub">What Medicare pays BSW/Luna per unit - national non-facility average</div>
+
+  <div class="table-wrap" style="margin-bottom:20px;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>CPT Code</th>
+          <th>Service</th>
+          <th>Unit</th>
+          <th>2026 Total Allowed</th>
+          <th>Medicare Pays (80%)</th>
+          <th>Patient Pays (20%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>97161–97163</strong></td>
+          <td>PT Evaluation</td>
+          <td>Per eval</td>
+          <td>$98.20</td>
+          <td>$78.56</td>
+          <td>$19.64</td>
+        </tr>
+        <tr>
+          <td><strong>97110</strong></td>
+          <td>Therapeutic Exercise</td>
+          <td>Per 15 min</td>
+          <td>$29.06</td>
+          <td>$23.25</td>
+          <td>$5.81</td>
+        </tr>
+        <tr>
+          <td><strong>97112</strong></td>
+          <td>Neuromuscular Re-education</td>
+          <td>Per 15 min</td>
+          <td>$32.73</td>
+          <td>$26.18</td>
+          <td>$6.55</td>
+        </tr>
+        <tr>
+          <td><strong>97530</strong></td>
+          <td>Therapeutic Activities</td>
+          <td>Per 15 min</td>
+          <td>$35.07</td>
+          <td>$28.06</td>
+          <td>$7.01</td>
+        </tr>
+        <tr>
+          <td><strong>97140</strong></td>
+          <td>Manual Therapy</td>
+          <td>Per 15 min</td>
+          <td>$27.72</td>
+          <td>$22.18</td>
+          <td>$5.54</td>
+        </tr>
+        <tr class="highlight-row">
+          <td colspan="2"><strong>Typical 60-min visit (4 timed units: 2x 97110 + 1x 97530 + 1x 97112)</strong></td>
+          <td>Per visit</td>
+          <td><strong>~$125.92</strong></td>
+          <td><strong>~$100.74</strong></td>
+          <td><strong>~$25.18</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div style="font-size:11px; color:var(--gray-text); margin-bottom:20px;">Note: 2026 KX modifier threshold is $2,480 (combined PT + SLP). Targeted medical review threshold is $3,000 (frozen through 2028). Conversion factor: $33.40 for non-APM participants.</div>
+
+  <hr class="divider">
+  <div class="section-title">Episode Cost Comparison - Typical TKA/THA Patient</div>
+
+  <div class="table-wrap" style="margin-bottom:20px;">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Home Health (PDGM 2026)</th>
+          <th>Outpatient Therapy at Home (MPFS)</th>
+          <th>CMS Saves With OPT</th>
+          <th>Patient Pays (OPT)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Conservative - 1 period, 12 visits</strong></td>
+          <td>~$1,900 – $2,100</td>
+          <td>~$1,287</td>
+          <td style="color:var(--amber); font-weight:700;">~$613 – $813</td>
+          <td style="color:var(--red);">~$605</td>
+        </tr>
+        <tr class="highlight-row">
+          <td><strong>Typical - 1 period, 16 visits</strong></td>
+          <td>~$2,000 – $2,400</td>
+          <td>~$1,690</td>
+          <td style="color:var(--amber); font-weight:700;">~$400 – $700</td>
+          <td style="color:var(--red);">~$706</td>
+        </tr>
+        <tr>
+          <td><strong>Extended - 2 periods, 20 visits</strong></td>
+          <td>~$3,500 – $4,400</td>
+          <td>~$2,093</td>
+          <td style="color:var(--amber); font-weight:700;">~$1,400 – $2,300</td>
+          <td style="color:var(--red);">~$807</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout callout-amber">
+    <div class="callout-title">⚠️ Critical Context - Not Apples to Apples</div>
+    Home health's PDGM payment is a bundled rate covering <strong>nursing + PT/OT together</strong>, with clinicians addressing ADLs directly - no separate aide tier. Outpatient therapy at home covers <em>only</em> therapy. If you stripped out the nursing component from the home health rate and compared just the therapy delivery cost, the gap narrows significantly. The CMS "savings" from routing to outpatient therapy comes at the cost of removing the nursing layer entirely.
+  </div>
+
+  <hr class="divider">
+  <div class="section-title">The Bundled Payment Connection - Why Surgeons Have Skin in the Game</div>
+
+  <div class="grid-2">
+    <div>
+      <div class="callout callout-navy">
+        <div class="callout-title">CJR-X - Coming October 1, 2027</div>
+        CMS proposed <strong>Comprehensive Care for Joint Replacement Expanded (CJR-X)</strong> - the first mandatory, nationwide bundled payment model in Medicare history. Comment period closed June 9, 2026. Final rule expected August 2026. More than <strong>2,500 hospitals</strong> will be required to participate.
+        <br><br>
+        Under CJR-X, hospitals own the <strong>entire 90-day Medicare episode</strong> - every Part A and Part B dollar from surgery through 90 days post-discharge. That includes SNF, home health, outpatient therapy, physician visits, readmissions, everything.
+      </div>
+      <div class="callout callout-teal">
+        <div class="callout-title">Post-Acute Care Cost Hierarchy</div>
+        <div style="display:flex; flex-direction:column; gap:8px; margin-top:4px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="background:var(--red); width:12px; height:12px; border-radius:2px; flex-shrink:0;"></div>
+            <span style="font-size:13px;"><strong>SNF Stay:</strong> $8,000–$20,000+ (30 days)</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="background:var(--amber); width:12px; height:12px; border-radius:2px; flex-shrink:0;"></div>
+            <span style="font-size:13px;"><strong>Home Health (Your Model):</strong> $2,000–$4,400</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="background:var(--green); width:12px; height:12px; border-radius:2px; flex-shrink:0;"></div>
+            <span style="font-size:13px;"><strong>Outpatient Therapy at Home:</strong> $1,300–$2,100</span>
+          </div>
+        </div>
+        <div style="margin-top:10px; font-size:12px;">At 300 joint replacements/year, choosing outpatient therapy over home health = <strong>$120,000–$690,000</strong> in episode savings - some of which flows back to the surgeon via gainsharing.</div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px;">How Surgeon Gainsharing Works Under CJR-X</div>
+        <ul class="bullet-list">
+          <li>Hospitals set a target price per episode with CMS</li>
+          <li>If the hospital's actual episode spending comes in below target → reconciliation payment to hospital</li>
+          <li>Hospitals can enter <strong>gainsharing arrangements</strong> with collaborating physicians (surgeons)</li>
+          <li>Surgeons receive a share of savings when their patients' episodes come in under target</li>
+          <li class="highlight">A surgeon routing 300 patients to cheaper post-acute care (outpatient therapy vs. home health) saves ~$120K–$690K in episode costs - directly increasing their gainsharing check</li>
+          <li>Gainsharing is subject to caps and quality requirements - cannot be tied to referral volume</li>
+          <li>This is a CMS-sanctioned, policy-approved financial incentive</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="section-title">How You Win This Conversation</div>
+  <div class="section-sub">Your counter-argument - using CMS's own data against the cost-savings narrative</div>
+
+  <div class="card">
+    <div class="tp-item">
+      <div class="tp-num">1</div>
+      <div class="tp-text"><span class="tp-strong">One readmission cancels years of post-acute savings.</span> Under CJR-X, a single readmission within 90 days falls on the hospital's episode tab - $15,000–$25,000 per event. The post-acute savings from routing 5 patients to outpatient therapy instead of home health (~$2,500–$10,000) evaporates instantly with one DVT that became a PE, one wound infection that wasn't caught, one patient who fell because no nurse was monitoring their gait. Skilled nursing in the home is the most cost-effective readmission prevention tool available.</div>
+    </div>
+    <div class="tp-item">
+      <div class="tp-num">2</div>
+      <div class="tp-text"><span class="tp-strong">CMS's own CJR data says home health is where smart hospitals went.</span> The NEJM two-year evaluation of the original CJR found that hospitals reduced costs primarily by shifting patients away from SNFs - and home health utilization actually <em>increased</em> under bundled payments. Hospitals determined that home health with nursing was a better readmission prevention investment than continuing down the care intensity ladder to therapy-only. The research supports your model, not BSW/Luna's.</div>
+    </div>
+    <div class="tp-item">
+      <div class="tp-num">3</div>
+      <div class="tp-text"><span class="tp-strong">Bring your readmission rate data.</span> This is the most powerful tool in this conversation. If you can show a surgeon: "Our home health patients for TKA/THA have a X% 30-day readmission rate vs. the national average of X%" - that's a real number they can plug into their CJR-X episode savings model. Quality and cost are not correlated - Trillian Health's analysis of CJR-X found that lower episode cost does not mean better outcomes. Your differentiation is: same or better outcomes, lower readmission risk, competitive episode cost.</div>
+    </div>
+    <div class="tp-item">
+      <div class="tp-num">4</div>
+      <div class="tp-text"><span class="tp-strong">Frame your service as a CJR-X partnership, not a commodity.</span> The UMP practices and the hospitals they operate out of will all be subject to CJR-X by October 2027. Position yourself now as a home health partner who understands bundled payments, communicates outcomes back to the surgical team, and can demonstrate episode-level performance. BSW/Luna can't do that - they're a therapy-only service with no nursing layer and no episode accountability.</div>
+    </div>
+    <div class="tp-item">
+      <div class="tp-num">5</div>
+      <div class="tp-text"><span class="tp-strong">Know the patient cost argument cold.</span> Even surgeons who don't care about their own savings will care when their patients come back at the 2-week follow-up complaining about a $600 therapy bill. "Your patients pay $0 with us. BSW/Luna charges them 20% coinsurance after their deductible. For a patient on Medicare with no supplemental plan, that's a real hardship." Patient satisfaction and billing complaints affect surgeon reputation and referral patterns back to the practice.</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="section-title">Quick Reference - CMS Cost Summary</div>
+  <div class="stat-row">
+    <div class="stat-box" style="border-color:var(--teal);">
+      <div class="stat-number" style="color:var(--teal);">$2,038</div>
+      <div class="stat-label">PDGM Base Rate (30-day period, 2026)</div>
+    </div>
+    <div class="stat-box" style="border-color:var(--amber);">
+      <div class="stat-number" style="color:var(--amber);">$1,690</div>
+      <div class="stat-label">CMS Cost: 16-Visit OPT Episode</div>
+    </div>
+    <div class="stat-box" style="border-color:var(--red);">
+      <div class="stat-number" style="color:var(--red);">$706</div>
+      <div class="stat-label">Avg Patient OOP: 16-Visit OPT</div>
+    </div>
+    <div class="stat-box" style="border-color:var(--green);">
+      <div class="stat-number" style="color:var(--green);">$0</div>
+      <div class="stat-label">Patient OOP: Home Health</div>
+    </div>
+    <div class="stat-box" style="border-color:var(--navy);">
+      <div class="stat-number" style="color:var(--navy);">$20K+</div>
+      <div class="stat-label">Cost of 1 Readmission (90-day bundle)</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + tabId).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  function switchPractice(practiceId) {
+    document.querySelectorAll('.practice-panel').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.practice-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('practice-' + practiceId).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
